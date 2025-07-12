@@ -2,7 +2,7 @@ import React, { useState, useCallback, memo } from 'react';
 import { motion } from 'framer-motion';
 import { User, Lock, Eye, EyeOff, ArrowRight, ArrowLeft, Sun, Moon, Palette } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
-import { toast } from '../ui/Toast';
+import { useToast } from '../../hooks/use-toast';
 
 const BackgroundAnimation = memo(({ theme }) => {
   const backgroundElements = React.useMemo(() => ({
@@ -323,6 +323,7 @@ const LoginScreen = ({ onBack }) => {
     return saved || 'light';
   });
   const { login } = useAuth();
+  const { toast } = useToast();
 
   React.useEffect(() => {
     document.documentElement.classList.toggle('dark', theme === 'dark' || theme === 'midnight' || theme === 'solid');

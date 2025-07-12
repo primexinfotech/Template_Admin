@@ -1,60 +1,39 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState } from 'react';
 
 const SidebarContext = createContext();
 
-export const useSidebar = () => {
-  const context = useContext(SidebarContext);
-  if (!context) {
-    throw new Error('useSidebar must be used within a SidebarProvider');
-  }
-  return context;
-};
-
-export const SidebarProvider = ({ children }) => {
+export function SidebarProvider({ children }) {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
-
-  useEffect(() => {
-    const checkMobile = () => {
-      const mobile = window.innerWidth < 1024;
-      setIsMobile(mobile);
-      if (mobile) {
-        setIsCollapsed(false); // Don't collapse on mobile, use isOpen instead
-        setIsOpen(false); // Auto-hide sidebar on mobile
-      } else {
-        setIsCollapsed(true); // Start collapsed on desktop
-        setIsOpen(true);
-      }
-    };
-
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
 
   const toggleSidebar = () => {
-    if (isMobile) {
-      setIsOpen(!isOpen);
-    } else {
-      setIsCollapsed(!isCollapsed);
-    }
+    setIsCollapsed(!isCollapsed);
   };
 
-  const closeSidebar = () => {
-    if (isMobile) {
-      setIsOpen(false);
-    }
+  const toggleMobileSidebar = () => {
+    setIsMobileOpen(!isMobileOpen);
   };
 
   const value = {
     isCollapsed,
-    isMobile,
-    isOpen,
+    isMobileOpen,
     toggleSidebar,
-    closeSidebar,
+    toggleMobileSidebar,
     setIsCollapsed,
+    setIsMobileOpen,
   };
 
-  return <SidebarContext.Provider value={value}>{children}</SidebarContext.Provider>;
-};
+  return (
+    <SidebarContext.Provider value={value}>
+      {children}
+    </SidebarContext.Provider>
+  );
+}
+
+export function useSidebar() {
+  const context = useContext(SidebarContext);
+  if (context === undefined) {
+    throw new Error('useSidebar must be used within a SidebarProvider');
+  }
+  return context;
+}

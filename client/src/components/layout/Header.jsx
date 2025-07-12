@@ -88,7 +88,7 @@ const Header = ({ onThemeToggle }) => {
                 <span className="hidden md:block text-sm text-gray-700 dark:text-gray-300">{user?.name || 'John Doe'}</span>
                 <ChevronDown className="w-4 h-4 text-gray-400" />
               </button>
-              
+
               {/* Dropdown Menu */}
               <div className="absolute right-0 top-full mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
                 <div className="py-1">

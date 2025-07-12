@@ -1,10 +1,10 @@
-
 import React from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { Toaster } from '@/components/ui/toaster';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { ThemeProvider } from '@/contexts/ThemeContext';
+import { Router } from 'wouter';
 import AuthWrapper from '@/components/auth/AuthWrapper';
 
 const queryClient = new QueryClient({
@@ -22,7 +22,9 @@ function App() {
       <AuthProvider>
         <ThemeProvider>
           <TooltipProvider>
-            <AuthWrapper />
+            <Router>
+              <AuthWrapper />
+            </Router>
             <Toaster />
           </TooltipProvider>
         </ThemeProvider>

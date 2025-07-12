@@ -1,211 +1,102 @@
 
-import React, { useState, useEffect, createContext, useContext } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { X, CheckCircle, AlertCircle, Info, AlertTriangle } from 'lucide-react';
+import * as React from "react";
+import * as ToastPrimitives from "@radix-ui/react-toast";
+import { cva } from "class-variance-authority";
+import { X } from "lucide-react";
+import { cn } from "@/lib/utils";
 
-// Toast Context
-const ToastContext = createContext();
+const ToastProvider = ToastPrimitives.Provider;
 
-// Toast Provider
-export const ToastProvider = ({ children }) => {
-  const [toasts, setToasts] = useState([]);
+const ToastViewport = React.forwardRef(({ className, ...props }, ref) => (
+  <ToastPrimitives.Viewport
+    ref={ref}
+    className={cn(
+      "fixed top-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]",
+      className
+    )}
+    {...props}
+  />
+));
+ToastViewport.displayName = ToastPrimitives.Viewport.displayName;
 
-  const addToast = (toast) => {
-    const id = Date.now() + Math.random();
-    setToasts(prev => [...prev, { ...toast, id }]);
-    
-    // Auto remove after duration
-    setTimeout(() => {
-      removeToast(id);
-    }, toast.duration || 5000);
-  };
-
-  const removeToast = (id) => {
-    setToasts(prev => prev.filter(toast => toast.id !== id));
-  };
-
-  return (
-    <ToastContext.Provider value={{ addToast, removeToast }}>
-      {children}
-      <ToastContainer toasts={toasts} removeToast={removeToast} />
-    </ToastContext.Provider>
-  );
-};
-
-// Hook to use toast
-export const useToast = () => {
-  const context = useContext(ToastContext);
-  if (!context) {
-    throw new Error('useToast must be used within ToastProvider');
+const toastVariants = cva(
+  "group pointer-events-auto relative flex w-full items-center justify-between space-x-4 overflow-hidden rounded-md border p-6 pr-8 shadow-lg transition-all data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-[var(--radix-toast-swipe-end-x)] data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-x)] data-[swipe=move]:transition-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=end]:animate-out data-[state=closed]:fade-out-80 data-[state=closed]:slide-out-to-right-full data-[state=open]:slide-in-from-top-full data-[state=open]:sm:slide-in-from-bottom-full",
+  {
+    variants: {
+      variant: {
+        default: "border bg-background text-foreground",
+        destructive:
+          "destructive border-destructive bg-destructive text-destructive-foreground",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
   }
-  return context;
-};
+);
 
-// Toast function for easy usage
-export const toast = (options) => {
-  if (window.toastContext) {
-    window.toastContext.addToast(options);
-  }
-};
-
-// Individual Toast Component
-const Toast = ({ message, type = 'info', onClose, duration = 5000 }) => {
-  const [isVisible, setIsVisible] = useState(true);
-  const [progress, setProgress] = useState(100);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setProgress(prev => {
-        const newProgress = prev - (100 / (duration / 100));
-        return newProgress > 0 ? newProgress : 0;
-      });
-    }, 100);
-
-    const timer = setTimeout(() => {
-      setIsVisible(false);
-      setTimeout(onClose, 300);
-    }, duration);
-
-    return () => {
-      clearTimeout(timer);
-      clearInterval(interval);
-    };
-  }, [duration, onClose]);
-
-  const getIcon = () => {
-    switch (type) {
-      case 'success':
-        return <CheckCircle className="w-5 h-5" />;
-      case 'error':
-        return <AlertCircle className="w-5 h-5" />;
-      case 'warning':
-        return <AlertTriangle className="w-5 h-5" />;
-      default:
-        return <Info className="w-5 h-5" />;
-    }
-  };
-
-  const getColors = () => {
-    switch (type) {
-      case 'success':
-        return {
-          bg: 'bg-gradient-to-r from-green-500 to-green-600',
-          border: 'border-green-400/50',
-          progress: 'bg-green-200'
-        };
-      case 'error':
-        return {
-          bg: 'bg-gradient-to-r from-red-500 to-red-600',
-          border: 'border-red-400/50',
-          progress: 'bg-red-200'
-        };
-      case 'warning':
-        return {
-          bg: 'bg-gradient-to-r from-yellow-500 to-yellow-600',
-          border: 'border-yellow-400/50',
-          progress: 'bg-yellow-200'
-        };
-      default:
-        return {
-          bg: 'bg-gradient-to-r from-blue-500 to-blue-600',
-          border: 'border-blue-400/50',
-          progress: 'bg-blue-200'
-        };
-    }
-  };
-
-  const colors = getColors();
-
-  const handleClose = () => {
-    setIsVisible(false);
-    setTimeout(onClose, 300);
-  };
-
+const Toast = React.forwardRef(({ className, variant, ...props }, ref) => {
   return (
-    <AnimatePresence>
-      {isVisible && (
-        <motion.div
-          initial={{ x: 400, opacity: 0, scale: 0.9 }}
-          animate={{ x: 0, opacity: 1, scale: 1 }}
-          exit={{ x: 400, opacity: 0, scale: 0.9 }}
-          transition={{ 
-            duration: 0.4, 
-            ease: [0.4, 0, 0.2, 1],
-            type: "spring",
-            stiffness: 300,
-            damping: 30
-          }}
-          className={`${colors.bg} text-white p-4 rounded-xl shadow-2xl max-w-sm border ${colors.border} backdrop-blur-sm relative overflow-hidden`}
-        >
-          {/* Progress bar */}
-          <div className="absolute bottom-0 left-0 h-1 bg-white/20 w-full">
-            <motion.div
-              className={`h-full ${colors.progress} opacity-60`}
-              initial={{ width: '100%' }}
-              animate={{ width: `${progress}%` }}
-              transition={{ ease: 'linear' }}
-            />
-          </div>
-
-          <div className="flex items-start space-x-3">
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.2, duration: 0.3 }}
-              className="flex-shrink-0"
-            >
-              {getIcon()}
-            </motion.div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium break-words">{message}</p>
-            </div>
-            <motion.button
-              onClick={handleClose}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              className="flex-shrink-0 p-1 hover:bg-white/10 rounded-full transition-colors"
-            >
-              <X className="w-4 h-4" />
-            </motion.button>
-          </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+    <ToastPrimitives.Root
+      ref={ref}
+      className={cn(toastVariants({ variant }), className)}
+      {...props}
+    />
   );
+});
+Toast.displayName = ToastPrimitives.Root.displayName;
+
+const ToastAction = React.forwardRef(({ className, ...props }, ref) => (
+  <ToastPrimitives.Action
+    ref={ref}
+    className={cn(
+      "inline-flex h-8 shrink-0 items-center justify-center rounded-md border bg-transparent px-3 text-sm font-medium ring-offset-background transition-colors hover:bg-secondary focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 group-[.destructive]:border-muted/40 group-[.destructive]:hover:border-destructive/30 group-[.destructive]:hover:bg-destructive group-[.destructive]:hover:text-destructive-foreground group-[.destructive]:focus:ring-destructive",
+      className
+    )}
+    {...props}
+  />
+));
+ToastAction.displayName = ToastPrimitives.Action.displayName;
+
+const ToastClose = React.forwardRef(({ className, ...props }, ref) => (
+  <ToastPrimitives.Close
+    ref={ref}
+    className={cn(
+      "absolute right-2 top-2 rounded-md p-1 text-foreground/50 opacity-0 transition-opacity hover:text-foreground focus:opacity-100 focus:outline-none focus:ring-2 group-hover:opacity-100 group-[.destructive]:text-red-300 group-[.destructive]:hover:text-red-50 group-[.destructive]:focus:ring-red-400 group-[.destructive]:focus:ring-offset-red-600",
+      className
+    )}
+    toast-close=""
+    {...props}
+  >
+    <X className="h-4 w-4" />
+  </ToastPrimitives.Close>
+));
+ToastClose.displayName = ToastPrimitives.Close.displayName;
+
+const ToastTitle = React.forwardRef(({ className, ...props }, ref) => (
+  <ToastPrimitives.Title
+    ref={ref}
+    className={cn("text-sm font-semibold", className)}
+    {...props}
+  />
+));
+ToastTitle.displayName = ToastPrimitives.Title.displayName;
+
+const ToastDescription = React.forwardRef(({ className, ...props }, ref) => (
+  <ToastPrimitives.Description
+    ref={ref}
+    className={cn("text-sm opacity-90", className)}
+    {...props}
+  />
+));
+ToastDescription.displayName = ToastPrimitives.Description.displayName;
+
+export {
+  ToastProvider,
+  ToastViewport,
+  Toast,
+  ToastTitle,
+  ToastDescription,
+  ToastClose,
+  ToastAction,
 };
-
-// Toast Container
-export const ToastContainer = ({ toasts, removeToast }) => {
-  useEffect(() => {
-    // Make toast function available globally
-    window.toastContext = { addToast: (toast) => {} };
-  }, []);
-
-  return (
-    <div className="fixed top-4 right-4 z-[9999] space-y-3 pointer-events-none">
-      <AnimatePresence mode="popLayout">
-        {toasts.map((toast, index) => (
-          <motion.div
-            key={toast.id}
-            layout
-            initial={{ opacity: 0, y: -50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -50 }}
-            transition={{ duration: 0.3 }}
-            className="pointer-events-auto"
-            style={{ zIndex: 9999 - index }}
-          >
-            <Toast
-              message={toast.message}
-              type={toast.type}
-              onClose={() => removeToast(toast.id)}
-              duration={toast.duration}
-            />
-          </motion.div>
-        ))}
-      </AnimatePresence>
-    </div>
-  );
-};
-
-export default Toast;
