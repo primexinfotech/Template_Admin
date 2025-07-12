@@ -1,0 +1,110 @@
+"Generate a modern, professional admin panel UI using React JS and Tailwind CSS. The design should be inspired by the attached Shipmozo-style panel with a clear focus on usability, customization, and modular component architecture.
+
+📌 Required Features:
+Layout Modes (Core Feature)
+
+Customizable Sidebar Modes
+
+Full (double) sidebar: Icon + Text
+
+Collapsed (single) sidebar: Icons only
+
+Toggle between Top Navigation and Left Sidebar
+
+Dynamic toggle for sidebar placement (top vs left)
+
+Header / Navbar Design
+
+Include:
+
+Search bar with filter tags
+
+Notification bell with dropdown
+
+Credits and wallet badge
+
+Profile avatar with settings dropdown
+
+Quick Actions / Add Order buttons
+
+Floating effect with shadow and slide-down animation
+
+Sidebar Navigation
+
+Inspired by the Shipmozo layout:
+
+Icons + Labels
+
+Submenu for nested items
+
+Toggle sidebar width
+
+Include category headers: Orders, Billing, Settings, Reports etc.
+
+Add animation for open/close
+
+Theme Customization Panel
+
+Change theme (light/dark/custom colors)
+
+Modify font size, line height, border radius
+
+Toggle animation ON/OFF globally
+
+Store preferences in localStorage
+
+Order Grid / Table View
+
+Responsive data grid (like in the image):
+
+Columns: Order Date, Product Details, Shipping Info, Pickup Address, Action
+
+Sorting, pagination (custom select for per page), filter by date/AWB/reference
+
+Action buttons: Print, Label, Send to Warehouse
+
+Include filter tabs: Pickup & Manifest, Courier Assigned, Delivered, etc.
+
+Interactive Popup / Toast Notifications
+
+Fully customizable alert/toast messages with slide/fade-in animations
+
+Allow user to toggle tone (info, error, success, warning)
+
+Utility Components
+
+Modal with animation
+
+Date range picker (pre-filled like: 09-06-2025 to 10-07-2025)
+
+Dropdowns with icon support
+
+Button variants: Outline, Ghost, Primary
+
+Toggle for showing AWB/reference filters
+
+🧱 Technical Stack:
+React JS (Component-based structure)
+
+Tailwind CSS (for utility-first design system)
+
+React Router DOM (for routing)
+
+Context API / Redux (for theme and sidebar state management)
+
+Framer Motion or React Spring (for smooth UI animations)
+
+Headless UI / Radix UI / ShadCN (for accessible UI components)
+
+🎯 Focus:
+High performance, modular and scalable code
+
+Pixel-perfect UI as seen in reference image
+
+Fully responsive design
+
+Admin UX that's easy to extend
+
+Accessibility and keyboard-friendly navigation
+
+Generate reusable components and ensure theming is easily managed across the app. Component theming and state should be configurable from a central settings module. Use sensible defaults but allow for full customization by the user/admin."
